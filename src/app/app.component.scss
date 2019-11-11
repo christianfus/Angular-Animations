@@ -1,0 +1,72 @@
+#div-todopoderoso {
+  overflow: hidden;
+
+  .left-gif{
+      right: 0;
+  }
+
+  .btn-move-down {
+    position: fixed;
+    bottom: 0;
+    left: 44%;
+    width: 30vh;
+    cursor: pointer;
+    .gif-down {
+      visibility: hidden;
+      width: 100px;
+    }
+  }
+  .btn-move-down:hover > .gif-down {
+    visibility: visible;
+  }
+
+  .btn-move-up {
+    position: fixed;
+    top: 0;
+    left: 44%;
+    width: 30vh;
+    cursor: pointer;
+    .gif-up {
+      visibility: hidden;
+      width: 100px;
+    }
+  }
+  .btn-move-up:hover > .gif-up {
+    visibility: visible;
+  }
+
+  .vertical-align-slide {
+    margin-top: 20vh;
+  }
+
+  .vertical-align-btn {
+    margin-top: 45vh;
+    z-index: 0;
+  }
+
+  i {
+    vertical-align: middle;
+  }
+
+  .btn-secondary {
+    background: #6c757d7a;
+    border: 0;
+    padding: 20%;
+  }
+
+  .btn-slide-right {
+    float: right;
+  }
+
+  .btn-slide-left {
+    z-index: 1;
+  }
+
+  .btn-slide-right:hover {
+    background: #6c757da6;
+  }
+
+  .btn-slide-left:hover {
+    background: #6c757da6;
+  }
+}
