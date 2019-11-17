@@ -6,7 +6,7 @@ import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { RoverDiscovery } from "./models/roverDiscoveryModel";
 import { DirectionConstants } from "./constants/directionConstants";
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 
 declare let particlesJS: any;
 @Component({
@@ -107,19 +107,22 @@ export class AppComponent {
     this.activeSlideIndex = 0;
   }
 
-  public changeSlidesType(direction: string) {
+  public changeSlidesType(direction: string, gifTime:number) {
     this.clearSlidesAndInterval();
-    this.checkActiveSlidesNASA = !this.checkActiveSlidesNASA;
-    this.moveDirection = direction;
-    if (this.checkActiveSlidesNASA) {
-      this.initiateSpaceTransmision();
-    } else {
-      this.slides = this.dataBringerService.getSlidesData();
-      this.activeSlide = this.slides[0];
-    }
+    this.showUpDownGifs(direction, gifTime);
+    setTimeout(() => {
+      this.checkActiveSlidesNASA = !this.checkActiveSlidesNASA;
+      this.moveDirection = direction;
+      if (this.checkActiveSlidesNASA) {
+        this.initiateSpaceTransmission();
+      } else {
+        this.slides = this.dataBringerService.getSlidesData();
+        this.activeSlide = this.slides[0];
+      }
+    }, gifTime-750);
   }
 
-  private initiateSpaceTransmision(){
+  private initiateSpaceTransmission() {
     this.nasaObservable$.subscribe(nasaData => {
       this.setNASASlides(nasaData.photos);
       this.intervalChangeNASASlide();
@@ -150,12 +153,18 @@ export class AppComponent {
     let slide: slideModel = {
       image: data.img_src,
       title: "Name: " + data.rover.name,
-      text: "<b>Landing Date:</b> " + data.rover.landing_date + "<br/>"
-            + "<b>Launch Date:</b> " + data.rover.launch_date + "<br/>"
-            + "<b>Status:</b> " + data.rover.status
+      text:
+        "<b>Landing Date:</b> " +
+        data.rover.landing_date +
+        "<br/>" +
+        "<b>Launch Date:</b> " +
+        data.rover.launch_date +
+        "<br/>" +
+        "<b>Status:</b> " +
+        data.rover.status
     };
     console.log(data);
-    
+
     return slide;
   }
 
@@ -166,11 +175,24 @@ export class AppComponent {
     return this.currentSlideDirection;
   }
 
-  private clearSlidesAndInterval(): void{
+  private clearSlidesAndInterval(): void {
     this.changeNasaSlideInterval ? clearInterval(this.changeNasaSlideInterval) : "";
     this.changeNasaSlideInterval = null;
     this.slides = [];
     this.activeSlideIndex = 0;
+  }
+
+  private showUpDownGifs(direction: string, time:number) {
+    direction == DirectionConstants.MOVE_UP
+      ? this.controlTimingGif(direction, time)
+      : this.controlTimingGif(direction, time);
+  }
+
+  private controlTimingGif(direction, time) {
+    direction == DirectionConstants.MOVE_UP ? (this.upGifVisible = true) : (this.downGifVisible = true);
+    setTimeout(() => {
+      direction == DirectionConstants.MOVE_UP ? (this.upGifVisible = false) : (this.downGifVisible = false);
+    }, time);
   }
 
   // SLIDES LOGIC
@@ -191,9 +213,9 @@ export class AppComponent {
   private changeActiveSlide(direction: string) {
     this.triggerSlideMovement(direction);
     setTimeout(() => {
-      if(!this.checkActiveSlidesNASA){
+      if (!this.checkActiveSlidesNASA) {
         direction == DirectionConstants.RIGHT ? this.activeSlideIndex++ : this.activeSlideIndex--;
-      }else{
+      } else {
         this.activeSlideIndex++;
       }
       this.activeSlide = this.slides[this.activeSlideIndex];

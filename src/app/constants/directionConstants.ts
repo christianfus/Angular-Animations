@@ -5,4 +5,6 @@ export class DirectionConstants{
     public static readonly DOWN:string = 'down';
     public static readonly MOVE_LEFT:string = 'moveLeft';
     public static readonly MOVE_RIGHT:string = 'moveRight';
+    public static readonly MOVE_UP:string = 'moveUp';
+    public static readonly MOVE_DOWN:string = 'moveDown';
 }
