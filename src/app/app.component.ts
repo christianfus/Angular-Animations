@@ -1,239 +1,231 @@
-import { Component } from '@angular/core';
-import { trigger, style, state, animate, transition, keyframes } from '@angular/animations';
-import { slideModel } from './models/slideModel';
+import { Component } from "@angular/core";
+import { trigger, style, state, animate, transition, keyframes } from "@angular/animations";
+import { slideModel } from "./models/slideModel";
+import { DataBringerService } from "./services/the-data-bringer.service";
+import { Observable } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { RoverDiscovery } from "./models/roverDiscoveryModel";
+import { DirectionConstants } from "./constants/directionConstants";
+import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
 
 declare let particlesJS: any;
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
   animations: [
-    trigger('doSlide', [
-      state(
-        'moveLeft',
-        style({})
+    trigger("doSlide", [
+      transition(
+        "*=>moveLeft",
+        animate(
+          "2000ms",
+          keyframes([
+            style({ offset: 0 }),
+            style({ transform: "translateX(-230vh)", offset: 0.5 }),
+            style({ transform: "translateX(230vh)", offset: 0.501 }),
+            style({ transform: "translateX(0)", offset: 1.0 })
+          ])
+        )
       ),
-      state(
-        'moveRight',
-        style({})
+      transition(
+        "*=>moveRight",
+        animate(
+          "2000ms",
+          keyframes([
+            style({ offset: 0 }),
+            style({ transform: "translateX(230vh)", offset: 0.5 }),
+            style({ transform: "translateX(-230vh)", offset: 0.501 }),
+            style({ transform: "translateX(0)", offset: 1.0 })
+          ])
+        )
       ),
-      transition('*=>moveLeft',
-      animate('2000ms', keyframes([
-        style({offset: 0}),
-        style({transform: 'translateX(-230vh)', offset: 0.5}),
-        style({transform: 'translateX(230vh)',    offset: 0.501}),
-        style({transform: 'translateX(0)', offset: 1.0})
-      ])
-      )),
-      transition('*=>moveRight',
-      animate('2000ms', keyframes([
-        style({offset: 0}),
-        style({transform: 'translateX(230vh)', offset: 0.5}),
-        style({transform: 'translateX(-230vh)',    offset: 0.501}),
-        style({transform: 'translateX(0)', offset: 1.0})
-      ])
-      ))
+      transition(
+        "*=>moveUp",
+        animate(
+          "2000ms",
+          keyframes([
+            style({ offset: 0 }),
+            style({ transform: "translateY(-230vh)", offset: 0.5 }),
+            style({ transform: "translateY(230vh)", offset: 0.501 }),
+            style({ transform: "translateY(0)", offset: 1.0 })
+          ])
+        )
+      ),
+      transition(
+        "*=>moveDown",
+        animate(
+          "2000ms",
+          keyframes([
+            style({ offset: 0 }),
+            style({ transform: "translateY(230vh)", offset: 0.5 }),
+            style({ transform: "translateY(-230vh)", offset: 0.501 }),
+            style({ transform: "translateY(0)", offset: 1.0 })
+          ])
+        )
+      )
     ])
   ]
 })
 export class AppComponent {
-
-  public myStyle: object 
-  public myParams: object
-  public width: number
-  public height: number
+  public myStyle: object;
+  public myParams: object;
+  public width: number;
+  public height: number;
   public moveDirection: string;
   public activeSlide: slideModel;
-  public activeSlideIndex: number;
-  public slides: Array<slideModel>;
+  private activeSlideIndex: number;
+  private slides: Array<slideModel>;
+  private nasaObservable$: Observable<any>;
+  private checkActiveSlidesNASA: boolean;
+  private changeNasaSlideInterval: any;
+  private currentSlideDirection: string;
+  private setNASASlideStyle: boolean;
 
   //GIFS
-  public leftGifVisible:boolean;
-  public rightGifVisible:boolean;
-  public leftGifMovement:string;
-  public rightGifMovement:string;
+  public leftGifMovement: string;
+  public rightGifMovement: string;
+  public upGifVisible: boolean;
+  public downGifVisible: boolean;
 
-  constructor() {
+  constructor(private http: HttpClient, private dataBringerService: DataBringerService) {
     this.myStyle = {};
     this.myParams = {};
     this.width = 100;
     this.height = 100;
-    this.leftGifVisible = true;
-    this.rightGifVisible = true;
+    this.upGifVisible = false;
+    this.downGifVisible = false;
+    this.currentSlideDirection = DirectionConstants.LEFT;
+    this.checkActiveSlidesNASA = false;
   }
 
-  public changeSlide(direction: boolean) {
-    if (direction) {
-       this.moveLeft();
+  ngOnInit() {
+    this.myStyle = this.dataBringerService.getParticleJSStyle();
+    this.myParams = this.dataBringerService.getParticleJSConfig();
+    this.nasaObservable$ = this.http.get(this.dataBringerService.getNasaAPI());
+    this.slides = this.dataBringerService.getSlidesData();
+    this.activeSlide = this.slides[0];
+    this.activeSlideIndex = 0;
+  }
+
+  public changeSlidesType(direction: string) {
+    this.clearSlidesAndInterval();
+    this.checkActiveSlidesNASA = !this.checkActiveSlidesNASA;
+    this.moveDirection = direction;
+    if (this.checkActiveSlidesNASA) {
+      this.initiateSpaceTransmision();
     } else {
-       this.moveRight();
+      this.slides = this.dataBringerService.getSlidesData();
+      this.activeSlide = this.slides[0];
     }
   }
 
-  public moveLeft(){
-    let direction = 'left'
-    this.triggerGifMovement(direction);
-
+  private initiateSpaceTransmision(){
+    this.nasaObservable$.subscribe(nasaData => {
+      this.setNASASlides(nasaData.photos);
+      this.intervalChangeNASASlide();
+    });
     setTimeout(() => {
-      if (this.activeSlideIndex > 0) {
-        setTimeout(() => {
-          this.activeSlideIndex--;
-          this.activeSlide = this.slides[this.activeSlideIndex];
-        }, 1000);
-        
-        this.triggerMovement(direction);
-      }else{
-        setTimeout(() => {
-          this.activeSlideIndex=this.slides.length-1;
-          this.activeSlide = this.slides[this.activeSlideIndex];
-        }, 1000);
-  
-        this.triggerMovement(direction);
-      }
-    }, 300);
-    
+      this.moveDirection = null;
+    }, 2000);
   }
 
-  public moveRight(){
-    let direction = 'right'
-    this.triggerGifMovement(direction);
+  private setNASASlides(data: RoverDiscovery[]) {
+    data.forEach((data: RoverDiscovery) => {
+      let slide: slideModel = this.transformNASADataToSlide(data);
+      this.slides.push(slide);
+    });
+    this.setNASASlideStyle = this.checkActiveSlidesNASA;
 
-    setTimeout(() => {
-      if (this.activeSlideIndex < this.slides.length-1) {
-        setTimeout(() => {
-          this.activeSlideIndex++;
-          this.activeSlide = this.slides[this.activeSlideIndex];
-        }, 1000);
-        this.triggerMovement(direction)
-      }else{
-        setTimeout(() => {
-          this.activeSlideIndex=0;
-          this.activeSlide = this.slides[this.activeSlideIndex];
-        }, 1000);
-        this.triggerMovement(direction);
-      }
-    }, 300);
-    
-  }
-
-  public triggerMovement(direction: string) {
-    direction == 'left' ? (this.moveDirection = 'moveLeft') : (this.moveDirection = 'moveRight');
-    setTimeout(() => {
-      this.moveDirection = '';
-    }, 2000); 
-  }
-
-  public triggerGifMovement(direction){
-    direction == 'left' ? (this.leftGifMovement = 'moveLeft') : (this.rightGifMovement = 'moveRight');
-    setTimeout(() => {
-      this.leftGifMovement = '';
-      this.rightGifMovement = '';
-    }, 2000); 
-  }
-
-
-  ngOnInit() {
-    this.slides = [
-      {
-        image: 'assets/images/gancho.gif',
-        title: 'Cap de ganxo',
-        text: 'Lorem ipsum dolor et sit amet y no se ke'
-      },
-      {
-        image: 'assets/images/burger.gif',
-        title: 'Bob\'s burguer',
-        text: 'Lorem ipsum dolor et sit amet y no se ke'
-      },
-      {
-        image: 'assets/images/rossie.gif',
-        title: 'Muten Roshi DBZ',
-        text: 'Lorem ipsum dolor et sit amet y no se ke'
-      }
-    ];
     this.activeSlide = this.slides[0];
+  }
+
+  private intervalChangeNASASlide() {
+    this.changeNasaSlideInterval = setInterval(() => {
+      let movement = this.alternateSlideMovement();
+      this.changeSlide(movement);
+    }, 7000);
+  }
+
+  private transformNASADataToSlide(data: RoverDiscovery): slideModel {
+    let slide: slideModel = {
+      image: data.img_src,
+      title: "Name: " + data.rover.name,
+      text: "<b>Landing Date:</b> " + data.rover.landing_date + "<br/>"
+            + "<b>Launch Date:</b> " + data.rover.launch_date + "<br/>"
+            + "<b>Status:</b> " + data.rover.status
+    };
+    console.log(data);
+    
+    return slide;
+  }
+
+  private alternateSlideMovement(): string {
+    this.currentSlideDirection == DirectionConstants.LEFT
+      ? (this.currentSlideDirection = DirectionConstants.RIGHT)
+      : (this.currentSlideDirection = DirectionConstants.LEFT);
+    return this.currentSlideDirection;
+  }
+
+  private clearSlidesAndInterval(): void{
+    this.changeNasaSlideInterval ? clearInterval(this.changeNasaSlideInterval) : "";
+    this.changeNasaSlideInterval = null;
+    this.slides = [];
     this.activeSlideIndex = 0;
+  }
 
-    this.myStyle = {
-      position: 'fixed',
-      background: 'black',
-      width: '100%',
-      height: '100%',
-      'z-index': -1,
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0
-    };
+  // SLIDES LOGIC
 
-    this.myParams = {
-      particles: {
-        number: {
-          value: 100,
-          density: {
-            enable: false,
-            value_area: 1600
-          }
-        },
-        color: {
-          value: '#fff'
-        },
-        shape: {
-          type: 'circle'
-        },
-        move: {
-          enable: true,
-          speed: 2.14420094855545,
-          direction: 'top-right',
-          random: true,
-          straight: false,
-          out_mode: 'out',
-          bounce: false,
-          attract: {
-            enable: false,
-            rotateX: 600,
-            rotateY: 1200
-          }
-        }
-      },
-      interactivity: {
-        detect_on: 'canvas',
-        events: {
-          onhover: {
-            enable: true,
-            mode: 'repulse'
-          },
-          onclick: {
-            enable: true,
-            mode: 'repulse'
-          },
-          resize: true
-        },
-        modes: {
-          grab: {
-            distance: 200,
-            line_linked: {
-              opacity: 1
-            }
-          },
-          bubble: {
-            distance: 400,
-            size: 40,
-            duration: 2,
-            opacity: 8,
-            speed: 3
-          },
-          repulse: {
-            distance: 127.4725274725275,
-            duration: 0.4
-          },
-          push: {
-            particles_nb: 4
-          },
-          remove: {
-            particles_nb: 2
-          }
-        }
+  public changeSlide(direction: string) {
+    this.triggerGifMovement(direction);
+    setTimeout(() => {
+      if (direction == DirectionConstants.RIGHT) {
+        this.activeSlideIndex < this.slides.length - 1
+          ? this.changeActiveSlide(direction)
+          : this.resetActiveSlide(direction);
+      } else {
+        this.activeSlideIndex > 0 ? this.changeActiveSlide(direction) : this.resetActiveSlide(direction);
       }
-    };
+    }, 150);
+  }
+
+  private changeActiveSlide(direction: string) {
+    this.triggerSlideMovement(direction);
+    setTimeout(() => {
+      if(!this.checkActiveSlidesNASA){
+        direction == DirectionConstants.RIGHT ? this.activeSlideIndex++ : this.activeSlideIndex--;
+      }else{
+        this.activeSlideIndex++;
+      }
+      this.activeSlide = this.slides[this.activeSlideIndex];
+    }, 1000);
+  }
+
+  private resetActiveSlide(direction: string) {
+    this.triggerSlideMovement(direction);
+    setTimeout(() => {
+      direction == DirectionConstants.RIGHT
+        ? (this.activeSlideIndex = 0)
+        : (this.activeSlideIndex = this.slides.length - 1);
+      this.activeSlide = this.slides[this.activeSlideIndex];
+    }, 1000);
+  }
+
+  private triggerSlideMovement(direction: string) {
+    direction == DirectionConstants.LEFT
+      ? (this.moveDirection = DirectionConstants.MOVE_LEFT)
+      : (this.moveDirection = DirectionConstants.MOVE_RIGHT);
+    setTimeout(() => {
+      this.moveDirection = null;
+    }, 2000);
+  }
+
+  private triggerGifMovement(direction: string) {
+    direction == DirectionConstants.LEFT
+      ? (this.leftGifMovement = DirectionConstants.MOVE_LEFT)
+      : (this.rightGifMovement = DirectionConstants.MOVE_RIGHT);
+    setTimeout(() => {
+      this.leftGifMovement = null;
+      this.rightGifMovement = null;
+    }, 2000);
   }
 }

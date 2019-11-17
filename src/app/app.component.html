@@ -1,15 +1,19 @@
 <particles [style]="myStyle" [width]="width" [height]="height" [params]="myParams"></particles>
 
-<div id="div-todopoderoso" class="container-fluid">
+<div id="div-todopoderoso" class="container-fluid h-100">
 
   <div class="gif-container">
-    <img [@doSlide]="leftGifMovement" *ngIf="leftGifVisible" src="assets/images/buvolando.gif" alt="left" class="position-fixed left-gif">
-    <img [@doSlide]="rightGifMovement" *ngIf="rightGifVisible" src="assets/images/buvolando2.gif" alt="right" class="position-fixed right-gif">
+    <!--Delivery Gifs-->
+    <img [@doSlide]="leftGifMovement" src="assets/images/buvolando.gif" alt="left" class="position-fixed left-gif">
+    <img [@doSlide]="rightGifMovement" src="assets/images/buvolando2.gif" alt="right" class="position-fixed right-gif">
+
+    <img *ngIf="upGifVisible" src="assets/images/luffy-up.gif" alt="left" class="position-fixed up-gif">
+    <img *ngIf="downGifVisible" src="assets/images/luffy-down.gif" alt="right" class="position-fixed down-gif">
   </div>
 
   <div class="row justify-content-around">
     <div class="col-2 vertical-align-btn">
-      <button (click)="changeSlide(true)" type="button" class="btn btn-secondary btn-lg btn-slide-left">
+      <button (click)="changeSlide('left')" type="button" class="btn btn-secondary btn-lg btn-slide-left">
         <i class="material-icons">
           keyboard_arrow_left
         </i>
@@ -18,25 +22,25 @@
 
     <div class="col-4 vertical-align-slide">
 
-      <div class="btn-move-up text-center">
+      <div (click)="changeSlidesType('moveUp')" class="btn-move-up text-center">
           <img src="assets/images/up.gif" alt="up" class="gif-up">
       </div>
 
-      <div [@doSlide]="moveDirection" class="card">
+      <div [@doSlide]="moveDirection" class="card" [ngClass]="{'nasaSlides': setNASASlideStyle}">
         <img src="{{ activeSlide.image }}" class="card-img-top" alt="TEST" />
-        <div class="card-body">
+        <div *ngIf="activeSlide.title || activeSlide.text" class="card-body">
           <h5 class="card-title">{{ activeSlide.title }}</h5>
-          <p class="card-text">{{ activeSlide.text }}</p>
+          <p class="card-text" [innerHTML]="activeSlide.text"></p>
         </div>
       </div>
 
-      <div class="btn-move-down text-center">
+      <div (click)="changeSlidesType('moveDown')" class="btn-move-down text-center">
         <img src="assets/images/down.gif" alt="down" class="gif-down">
       </div>
     </div>
 
     <div class="col-2 vertical-align-btn">
-      <button (click)="changeSlide(false)" type="button" class="btn btn-secondary btn-slide-right btn-lg">
+      <button (click)="changeSlide('right')" type="button" class="btn btn-secondary btn-slide-right btn-lg">
         <i class="material-icons">
           keyboard_arrow_right
         </i>

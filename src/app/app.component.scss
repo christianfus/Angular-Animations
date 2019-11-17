@@ -1,8 +1,38 @@
 #div-todopoderoso {
   overflow: hidden;
 
-  .left-gif{
-      right: 0;
+  .nasaSlides{
+    top: 10vh;
+    width: 800px;
+    left: calc(50vw - 400px);
+    position: fixed;
+    .card-img-top{
+      max-height: 500px;
+    }
+  }
+  .left-gif {
+    z-index: 100;
+    right: 0;
+  }
+
+  .right-gif{
+    z-index: 100;
+  }
+
+  .up-gif {
+    bottom: 100px;
+    z-index: 3;
+    width: 500px;
+    left: 50%;
+    margin-left: -600px;
+  }
+
+  .down-gif {
+    z-index: 3;
+    width: 300px;
+    margin-left: -231px;
+    top: -100px;
+    left:50%
   }
 
   .btn-move-down {
@@ -41,7 +71,7 @@
 
   .vertical-align-btn {
     margin-top: 45vh;
-    z-index: 0;
+    z-index: 3;
   }
 
   i {
