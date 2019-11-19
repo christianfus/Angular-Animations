@@ -36,14 +36,29 @@ export class DataBringerService {
     };
     this.slidesData = [
       {
-        image: 'assets/images/gancho.gif',
+        image: 'assets/carrousel/1.PNG',
       },
       {
-        image: 'assets/images/burger.gif',
+        image: 'assets/carrousel/2.PNG',
       },
       {
-        image: 'assets/images/rossie.gif',
-      }
+        image: 'assets/carrousel/3.PNG',
+      },
+      {
+        image: 'assets/carrousel/4.PNG',
+      },
+      {
+        image: 'assets/carrousel/5.PNG',
+      },
+      {
+        image: 'assets/carrousel/6.PNG',
+      },
+      {
+        image: 'assets/carrousel/7.PNG',
+      },
+      {
+        image: 'assets/carrousel/.PNG',
+      },
     ];
   }
 

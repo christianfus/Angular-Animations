@@ -1,15 +1,16 @@
 #div-todopoderoso {
   overflow: hidden;
 
-  .nasaSlides{
+  .slides{
     top: 10vh;
-    width: 800px;
-    left: calc(50vw - 400px);
+    width: 70vw;
+    left: 15vw;
     position: fixed;
     .card-img-top{
-      max-height: 500px;
+      max-height: 70vh;
     }
   }
+
   .left-gif {
     z-index: 100;
     right: 0;

@@ -29,7 +29,8 @@
         <img src="assets/images/up.gif" alt="up" class="gif-up" />
       </div>
 
-      <div [@doSlide]="moveDirection" class="card" [ngClass]="{ nasaSlides: setNASASlideStyle }">
+      <div [@doSlide]="moveDirection" class="card slides" 
+      [ngClass]="{ 'mt-5': !checkActiveSlidesNASA }">
         <img src="{{ activeSlide.image }}" class="card-img-top" alt="TEST" />
         <div *ngIf="activeSlide.title || activeSlide.text" class="card-body">
           <h5 class="card-title">{{ activeSlide.title }}</h5>

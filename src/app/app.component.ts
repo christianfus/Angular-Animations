@@ -79,7 +79,6 @@ export class AppComponent {
   private checkActiveSlidesNASA: boolean;
   private changeNasaSlideInterval: any;
   private currentSlideDirection: string;
-  private setNASASlideStyle: boolean;
 
   //GIFS
   public leftGifMovement: string;
@@ -137,8 +136,6 @@ export class AppComponent {
       let slide: slideModel = this.transformNASADataToSlide(data);
       this.slides.push(slide);
     });
-    this.setNASASlideStyle = this.checkActiveSlidesNASA;
-
     this.activeSlide = this.slides[0];
   }
 
