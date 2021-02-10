@@ -1,30 +1,31 @@
-import { Injectable } from "@angular/core";
-import { slideModel } from '../models/slideModel';
+import { Injectable } from '@angular/core'
+import { slideModel } from '../models/slideModel'
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root',
 })
 export class DataBringerService {
-  private particleJsConfig: any;
-  private particleJsStyle: any;
-  private slidesData: slideModel[];
-  private nasaApi: string;
+  private particleJsConfig: any
+  private particleJsStyle: any
+  private slidesData: slideModel[]
+  private nasaApi: string
 
   constructor() {
-    this.nasaApi = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=2&api_key=WuvGIBuwjNy1OVOvZeyH1yzysvjdqgGKjnK3nHUh";
+    this.nasaApi =
+      'https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol=1000&page=2&api_key=WuvGIBuwjNy1OVOvZeyH1yzysvjdqgGKjnK3nHUh'
     this.particleJsConfig = {
       particles: {
         number: {
-          value: 20
+          value: 20,
         },
         color: {
-          value: "#fff"
+          value: '#fff',
         },
         shape: {
-          type: "triangle"
-        }
-      }
-    };
+          type: 'triangle',
+        },
+      },
+    }
     this.particleJsStyle = {
       position: 'fixed',
       background: 'black',
@@ -32,11 +33,11 @@ export class DataBringerService {
       top: 0,
       left: 0,
       right: 0,
-      bottom: 0
-    };
+      bottom: 0,
+    }
     this.slidesData = [
       {
-        image: 'assets/carrousel/1.PNG',
+        image: 'assets/carrousel/test1.PNG',
       },
       {
         image: 'assets/carrousel/2.PNG',
@@ -57,24 +58,24 @@ export class DataBringerService {
         image: 'assets/carrousel/7.PNG',
       },
       {
-        image: 'assets/carrousel/.PNG',
+        image: 'assets/carrousel/8.PNG',
       },
-    ];
+    ]
   }
 
   public getParticleJSConfig(): any {
-    return this.particleJsConfig;
+    return this.particleJsConfig
   }
 
   public getParticleJSStyle(): any {
-    return this.particleJsStyle;
+    return this.particleJsStyle
   }
 
   public getSlidesData(): any {
-    return this.slidesData;
+    return this.slidesData
   }
 
   public getNasaAPI(): any {
-    return this.nasaApi;
+    return this.nasaApi
   }
 }
